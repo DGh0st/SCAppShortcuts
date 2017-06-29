@@ -89,8 +89,8 @@ static void preferencesChanged() {
 }
 
 // implement custom section view
-// height will always be 64
-// width will be either same as width of screen (orientation dependent) or width of screen - 40
+// height will always be 64 (but changing the frame's height inside initWithFrame will change the height)
+// width will be either same as width of screen (orientation dependent) or width of screen - 40 (unchangeable)
 @implementation ControlCenterSCAppShortcutsView
 -(id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
