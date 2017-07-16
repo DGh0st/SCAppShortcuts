@@ -64,6 +64,9 @@ NSMutableArray *shortcutsViews = [NSMutableArray array];
 NSInteger portraitPerPage = 5;
 NSInteger landscapePerPage = -1;
 
+NSMutableArray *portraitEnabledApplications = nil;
+NSMutableArray *landscapeEnabledApplications = nil;
+
 static void preferencesChanged() {
 	CFPreferencesAppSynchronize(CFSTR("com.dgh0st.scappshortcuts"));
 
@@ -84,13 +87,16 @@ static void preferencesChanged() {
 	portraitPerPage = [prefs objectForKey:@"portraitPerPage"] ? [[prefs objectForKey:@"portraitPerPage"] intValue] : 5;
 	landscapePerPage = [prefs objectForKey:@"landscapePerPage"] ? [[prefs objectForKey:@"landscapePerPage"] intValue] : -1;
 
+	portraitEnabledApplications = [prefs objectForKey:@"portraitEnabledApplications"] ?: nil;
+	landscapeEnabledApplications = [prefs objectForKey:@"landscapeEnabledApplications"] ?: nil;
+
 	for (ControlCenterSCAppShortcutsView *shortcutsView in shortcutsViews)
 		[shortcutsView setupScrollView];
 }
 
 // implement custom section view
-// height will always be 64 (but changing the frame's height inside initWithFrame will change the height)
-// width will be either same as width of screen (orientation dependent) or width of screen - 40 (unchangeable)
+// height will always be 64
+// width will be either same as width of screen (orientation dependent) or width of screen - 40
 @implementation ControlCenterSCAppShortcutsView
 -(id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
@@ -113,9 +119,10 @@ static void preferencesChanged() {
 	scrollView.showsVerticalScrollIndicator = NO;
 	scrollView.showsHorizontalScrollIndicator = NO;
 
-	NSArray *sortedDisplayIdentifiers = nil;
+	NSArray *sortedDisplayIdentifiers = isLandscape ? landscapeEnabledApplications : portraitEnabledApplications;
 	ALApplicationList *applicationList = [ALApplicationList sharedApplicationList];
-	[applicationList applicationsFilteredUsingPredicate:nil onlyVisible:YES titleSortedIdentifiers:&sortedDisplayIdentifiers];
+	if (sortedDisplayIdentifiers == nil)
+		[applicationList applicationsFilteredUsingPredicate:nil onlyVisible:YES titleSortedIdentifiers:&sortedDisplayIdentifiers];
 
 	CGFloat padding = 6.55555556;
 
@@ -143,8 +150,22 @@ static void preferencesChanged() {
 		}
 	}
 
-	if (appNumber != -1 && appNumber % appsPerPage == 0)
+	if (appsPerPage != -1 && appNumber % appsPerPage == 0)
 		widthSoFar -= scrollView.frame.size.width;
+
+	if (appNumber == 0) {
+		UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, scrollView.frame.size.width, scrollView.frame.size.height)];
+		label.text = @"No Applications Selected";
+		label.font = [UIFont systemFontOfSize:16];
+		label.numberOfLines = 2;
+		label.textColor = [UIColor whiteColor];
+		label.textAlignment = NSTextAlignmentCenter;
+		[scrollView addSubview:label];
+
+		[label release];
+
+		widthSoFar = scrollView.frame.size.width;
+	}
 
 	[scrollView setContentSize:CGSizeMake(widthSoFar, self.frame.size.height)];
 	[self addSubview:scrollView];
