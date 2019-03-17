@@ -1,4 +1,5 @@
-#include "SCARootListController.h"
+#import "SCARootListController.h"
+#import <Preferences/PSSpecifier.h>
 
 @interface ALApplicationList (SCAPrivate)
 -(NSArray *)_hiddenDisplayIdentifiers;
@@ -60,8 +61,9 @@
 		[_applicationList applicationsFilteredUsingPredicate:nil onlyVisible:YES titleSortedIdentifiers:&allDisplayIdentifiers];
 		
 		self.allApplications = [NSMutableArray array];
-		[self.allApplications addObjectsFromArray:allDisplayIdentifiers];
-		[self.allApplications removeObjectsInArray:[_applicationList _hiddenDisplayIdentifiers]];
+		for (NSString *displayIdentifier in allDisplayIdentifiers)
+			if ([_applicationList applicationWithDisplayIdentifierIsHidden:displayIdentifier])
+				[self.allApplications addObject:displayIdentifier];
 	}
 
 	return self;

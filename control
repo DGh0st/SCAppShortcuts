@@ -1,7 +1,7 @@
 Package: com.dgh0st.scappshortcuts
 Name: SCAppShortcuts
 Depends: mobilesubstrate, preferenceloader, com.dgh0st.switchercontrols | org.thebigboss.switchercontrols, applist
-Version: 0.0.1
+Version: 0.0.2
 Architecture: iphoneos-arm
 Description: Add app shortcut section to SwitcherControls.
 Maintainer: DGh0st <deeppwnage@yahoo.com>

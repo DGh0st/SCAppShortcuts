@@ -1,5 +1,5 @@
 #import <AppList/AppList.h>
-#import <Preferences/Preferences.h>
+#import <Preferences/PSViewController.h>
 
 #define identifier @"com.dgh0st.scappshortcuts"
 #define kSettingsPath @"/var/mobile/Library/Preferences/com.dgh0st.scappshortcuts.plist"
@@ -81,7 +81,7 @@ static void preferencesChanged() {
 			CFRelease(keyList);
 		}
 	} else {
-		prefs = [NSDictionary dictionaryWithContentsOfFile:kSettingsPath];
+		prefs = [[NSDictionary alloc] initWithContentsOfFile:kSettingsPath];
 	}
 
 	portraitPerPage = [prefs objectForKey:@"portraitPerPage"] ? [[prefs objectForKey:@"portraitPerPage"] intValue] : 5;
@@ -92,6 +92,8 @@ static void preferencesChanged() {
 
 	for (ControlCenterSCAppShortcutsView *shortcutsView in shortcutsViews)
 		[shortcutsView setupScrollView];
+
+	[prefs release];
 }
 
 // implement custom section view
